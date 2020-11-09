@@ -117,7 +117,8 @@ const styles = StyleSheet.create({
     borderColor: '#777777',
     padding: 0,
     height:40,
-    width:'40%',
+    width:'50%',
+    alignSelf:'center',
     margin: 20,
     backgroundColor:'#ffffff'
   },
