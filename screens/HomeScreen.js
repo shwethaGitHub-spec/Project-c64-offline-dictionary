@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import {View, Text, TextInput, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, StyleSheet, Alert} from 'react-native';
 import {Header} from 'react-native-elements';
+import dictionary from '../LocalDB';
 
 export default class HomeScreen extends Component{
   constructor(){
@@ -10,37 +11,29 @@ export default class HomeScreen extends Component{
       word:'',
       isSearchPressed:false,
       definition:'',
-      lexicalCategory:''
+      lexicalCategory:'',
+      lexicalCategoryText:''
     }
   }
 
-  getWord = (word)=>{
-    var searchKeyWord = word.toLowerCase().trim();
-    var url = "https://rupinwhitehatjr.github.io/dictionary/" + searchKeyWord + ".json";
-    return fetch(url)
-    .then((data)=>{
-      if(data.status===200){
-        return data.json();
-      }
-      else{
-        return null;
-      }
-    })
-    .then((response)=>{
-      var responseObject = response;
+  displayAlert = ()=>{
+    Alert.alert('Word is not there in the database');
+  }
 
-      if(responseObject){
-        var wordData = responseObject.definitions[0];
-        var description = wordData.description;
-        var lexicalCategory = wordData.wordtype;
-        //console.log(description);
-        //console.log(lexicalCategory);
-        this.setState({word:this.state.text, definition:description, lexicalCategory:lexicalCategory});
-      }
-      else{
-        this.setState({word:this.state.text, definition: "Not Found", lexicalCategory: "Not Found"});
-      }
-    })
+  getWord = (word)=>{
+    console.log(word);
+    var searchKeyWord = word.toLowerCase().trim();
+    var wordData = dictionary[searchKeyWord];
+    console.log(wordData);
+    if(wordData!==undefined){
+      var description = wordData.definition;
+      var lexicalCategory = wordData.lexicalCategory;
+      this.setState({word:searchKeyWord.toUpperCase(), definition:description, definitionText:'Definition:', lexicalCategory:lexicalCategory, lexicalCategoryText:'Lexical Category:'});
+    }
+    else{
+      this.setState({word:searchKeyWord.toUpperCase(), definition:'', definitionText:'', lexicalCategory:'',lexicalCategoryText:''});
+      this.displayAlert();
+    }
   }
 
   render(){
@@ -78,15 +71,15 @@ export default class HomeScreen extends Component{
           <View>
             <Text style = {styles.textDisplay}>Word:</Text>
             <Text
-              style = {styles.definition_word_lexical_style}>{this.state.word.toUpperCase()}
+              style = {styles.definition_word_lexical_style}>{this.state.word}
             </Text>
 
-            <Text style = {styles.textDisplay}>Definition:</Text>
+            <Text style = {styles.textDisplay}>{this.state.definitionText}</Text>
             <Text
               style = {styles.definition_word_lexical_style}>{this.state.definition}
             </Text>
 
-            <Text style = {styles.textDisplay}>Lexical Category:</Text> 
+            <Text style = {styles.textDisplay}>{this.state.lexicalCategoryText}</Text> 
             <Text
               style = {styles.definition_word_lexical_style}>{this.state.lexicalCategory}
             </Text>
@@ -98,8 +91,8 @@ export default class HomeScreen extends Component{
           </View>}
         </View>
       </View>
-      );
-    }
+    );
+  }
 }
 
 const styles = StyleSheet.create({
